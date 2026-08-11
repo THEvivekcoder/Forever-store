@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Frontend build
+dist/
+
+# Logs
+*.log
+
+# macOS
+.DS_Store
