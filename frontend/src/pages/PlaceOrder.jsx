@@ -1,643 +1,153 @@
-import React, {
-    useContext,
-    useState
-} from 'react'
-
+import React, { useContext, useState } from 'react'
 import Title from '../components/Title'
 import CartTotal from '../components/CartTotal'
-
-import {
-    ShopContext
-} from '../context/ShopContext'
-
+import { ShopContext } from '../context/ShopContext'
 import axios from 'axios'
+import { toast } from 'react-toastify'
 
-import {
-    toast
-} from 'react-toastify'
-
+const InputField = ({ label, ...props }) => (
+  <div className='flex flex-col gap-1.5'>
+    <label className='text-xs font-medium text-gray-600'>{label}</label>
+    <input
+      {...props}
+      className='border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-400 transition-colors'
+    />
+  </div>
+)
 
 const PlaceOrder = () => {
+  const [method] = useState('cod')
+  const [loading, setLoading] = useState(false)
 
-    // =====================================================
-    // PAYMENT METHOD
-    // =====================================================
+  const {
+    navigate, backendUrl, token,
+    cartItems, setCartItems,
+    getCartAmount, delivery_fee, products
+  } = useContext(ShopContext)
 
-    // Currently we accept only Cash on Delivery
-    const [method] = useState('cod')
+  const [formData, setFormData] = useState({
+    firstName: '', lastName: '', email: '',
+    street: '', city: '', state: '',
+    zipcode: '', country: '', phone: ''
+  })
 
+  const onChange = (e) =>
+    setFormData(d => ({ ...d, [e.target.name]: e.target.value }))
 
-    // =====================================================
-    // CONTEXT
-    // =====================================================
-
-    const {
-        navigate,
-        backendUrl,
-        token,
-        cartItems,
-        setCartItems,
-        getCartAmount,
-        delivery_fee,
-        products
-    } = useContext(ShopContext)
-
-
-    // =====================================================
-    // FORM DATA
-    // =====================================================
-
-    const [formData, setFormData] = useState({
-
-        firstName: '',
-        lastName: '',
-        email: '',
-        street: '',
-        city: '',
-        state: '',
-        zipcode: '',
-        country: '',
-        phone: ''
-
-    })
-
-
-    // =====================================================
-    // FORM CHANGE HANDLER
-    // =====================================================
-
-    const onChangeHandler = (event) => {
-
-        const name = event.target.name
-        const value = event.target.value
-
-        setFormData(data => ({
-
-            ...data,
-
-            [name]: value
-
-        }))
-    }
-
-
-    // =====================================================
-    // SUBMIT ORDER
-    // =====================================================
-
-    const onSubmitHandler = async (event) => {
-
-        event.preventDefault()
-
-
-        try {
-
-            // =================================================
-            // CREATE ORDER ITEMS
-            // =================================================
-
-            let orderItems = []
-
-
-            for (const items in cartItems) {
-
-                for (const item in cartItems[items]) {
-
-                    if (
-                        cartItems[items][item] > 0
-                    ) {
-
-                        const itemInfo =
-                            structuredClone(
-
-                                products.find(
-                                    product =>
-                                        product._id === items
-                                )
-
-                            )
-
-
-                        if (itemInfo) {
-
-                            itemInfo.size = item
-
-                            itemInfo.quantity =
-                                cartItems[items][item]
-
-                            orderItems.push(
-                                itemInfo
-                            )
-                        }
-                    }
-                }
+  const onSubmitHandler = async (e) => {
+    e.preventDefault()
+    setLoading(true)
+    try {
+      let orderItems = []
+      for (const id in cartItems) {
+        for (const size in cartItems[id]) {
+          if (cartItems[id][size] > 0) {
+            const info = structuredClone(products.find(p => p._id === id))
+            if (info) {
+              info.size = size
+              info.quantity = cartItems[id][size]
+              orderItems.push(info)
             }
-
-
-            // =================================================
-            // CHECK CART
-            // =================================================
-
-            if (orderItems.length === 0) {
-
-                toast.error(
-                    'Your cart is empty'
-                )
-
-                return
-            }
-
-
-            // =================================================
-            // ORDER DATA
-            // =================================================
-
-            const orderData = {
-
-                address: formData,
-
-                items: orderItems,
-
-                amount:
-                    getCartAmount() +
-                    delivery_fee
-
-            }
-
-
-            console.log(
-                'ORDER DATA:'
-            )
-
-            console.log(
-                orderData
-            )
-
-
-            // =================================================
-            // PLACE COD ORDER
-            // =================================================
-
-            const response =
-                await axios.post(
-
-                    backendUrl +
-                    '/api/order/place',
-
-                    orderData,
-
-                    {
-                        headers: {
-                            token
-                        }
-                    }
-
-                )
-
-
-            // =================================================
-            // RESPONSE
-            // =================================================
-
-            if (
-                response.data.success
-            ) {
-
-                toast.success(
-                    'Order placed successfully!'
-                )
-
-
-                // Clear cart
-                setCartItems({})
-
-
-                // Navigate to orders
-                navigate('/orders')
-
-
-            } else {
-
-                toast.error(
-
-                    response.data.message ||
-                    'Unable to place order'
-
-                )
-            }
-
-
-        } catch (error) {
-
-            console.log(
-                'ORDER ERROR:'
-            )
-
-            console.log(
-                error
-            )
-
-
-            toast.error(
-
-                error.response?.data?.message ||
-                error.message ||
-                'Something went wrong while placing your order'
-
-            )
+          }
         }
+      }
+
+      if (orderItems.length === 0) {
+        toast.error('Your cart is empty')
+        setLoading(false)
+        return
+      }
+
+      const orderData = {
+        address: formData,
+        items: orderItems,
+        amount: getCartAmount() + delivery_fee
+      }
+
+      const response = await axios.post(backendUrl + '/api/order/place', orderData, { headers: { token } })
+
+      if (response.data.success) {
+        toast.success('Order placed successfully!')
+        setCartItems({})
+        navigate('/orders')
+      } else {
+        toast.error(response.data.message || 'Unable to place order')
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message || 'Something went wrong')
+    } finally {
+      setLoading(false)
     }
+  }
 
+  return (
+    <form onSubmit={onSubmitHandler} className='pt-10 border-t border-gray-100 pb-20'>
 
-    // =====================================================
-    // UI
-    // =====================================================
+      <div className='flex flex-col lg:flex-row gap-12'>
 
-    return (
+        {/* ── Delivery info ── */}
+        <div className='flex-1'>
+          <div className='mb-8'>
+            <Title text1='DELIVERY' text2='INFORMATION' />
+          </div>
 
-        <form
-            onSubmit={onSubmitHandler}
-            className='
-                flex
-                flex-col
-                sm:flex-row
-                justify-between
-                gap-4
-                pt-5
-                sm:pt-14
-                min-h-[80vh]
-                border-t
-            '
-        >
+          <div className='flex flex-col gap-4'>
+            <div className='grid grid-cols-2 gap-4'>
+              <InputField label='First Name' name='firstName' value={formData.firstName} onChange={onChange} placeholder='John' required />
+              <InputField label='Last Name' name='lastName' value={formData.lastName} onChange={onChange} placeholder='Doe' required />
+            </div>
+            <InputField label='Email Address' name='email' value={formData.email} onChange={onChange} type='email' placeholder='john@example.com' required />
+            <InputField label='Street Address' name='street' value={formData.street} onChange={onChange} placeholder='123 Main Street' required />
+            <div className='grid grid-cols-2 gap-4'>
+              <InputField label='City' name='city' value={formData.city} onChange={onChange} placeholder='Mumbai' required />
+              <InputField label='State' name='state' value={formData.state} onChange={onChange} placeholder='Maharashtra' />
+            </div>
+            <div className='grid grid-cols-2 gap-4'>
+              <InputField label='Pincode' name='zipcode' value={formData.zipcode} onChange={onChange} inputMode='numeric' placeholder='400001' required />
+              <InputField label='Country' name='country' value={formData.country} onChange={onChange} placeholder='India' required />
+            </div>
+            <InputField label='Phone Number' name='phone' value={formData.phone} onChange={onChange} type='tel' inputMode='numeric' placeholder='+91 98765 43210' required />
+          </div>
+        </div>
 
+        {/* ── Order summary + payment ── */}
+        <div className='w-full lg:w-96 flex-shrink-0 flex flex-col gap-6'>
 
-            {/* =================================================
-                DELIVERY INFORMATION
-            ================================================= */}
+          <CartTotal />
 
+          {/* Payment method */}
+          <div>
+            <p className='text-xs font-semibold tracking-widest text-gray-900 uppercase mb-4'>Payment Method</p>
 
-            <div
-                className='
-                    flex
-                    flex-col
-                    gap-4
-                    w-full
-                    sm:max-w-[480px]
-                '
-            >
-
-
-                <div
-                    className='
-                        text-xl
-                        sm:text-2xl
-                        my-3
-                    '
-                >
-
-                    <Title
-                        text1={'DELIVERY'}
-                        text2={'INFORMATION'}
-                    />
-
-                </div>
-
-
-                {/* FIRST NAME + LAST NAME */}
-
-                <div className='flex gap-3'>
-
-                    <input
-                        required
-                        onChange={onChangeHandler}
-                        name='firstName'
-                        value={formData.firstName}
-                        className='
-                            border
-                            border-gray-300
-                            rounded
-                            py-1.5
-                            px-3.5
-                            w-full
-                        '
-                        type='text'
-                        placeholder='First name'
-                    />
-
-
-                    <input
-                        required
-                        onChange={onChangeHandler}
-                        name='lastName'
-                        value={formData.lastName}
-                        className='
-                            border
-                            border-gray-300
-                            rounded
-                            py-1.5
-                            px-3.5
-                            w-full
-                        '
-                        type='text'
-                        placeholder='Last name'
-                    />
-
-                </div>
-
-
-                {/* EMAIL */}
-
-                <input
-                    required
-                    onChange={onChangeHandler}
-                    name='email'
-                    value={formData.email}
-                    className='
-                        border
-                        border-gray-300
-                        rounded
-                        py-1.5
-                        px-3.5
-                        w-full
-                    '
-                    type='email'
-                    placeholder='Email address'
-                />
-
-
-                {/* STREET */}
-
-                <input
-                    required
-                    onChange={onChangeHandler}
-                    name='street'
-                    value={formData.street}
-                    className='
-                        border
-                        border-gray-300
-                        rounded
-                        py-1.5
-                        px-3.5
-                        w-full
-                    '
-                    type='text'
-                    placeholder='Street'
-                />
-
-
-                {/* CITY + STATE */}
-
-                <div className='flex gap-3'>
-
-                    <input
-                        required
-                        onChange={onChangeHandler}
-                        name='city'
-                        value={formData.city}
-                        className='
-                            border
-                            border-gray-300
-                            rounded
-                            py-1.5
-                            px-3.5
-                            w-full
-                        '
-                        type='text'
-                        placeholder='City'
-                    />
-
-
-                    <input
-                        onChange={onChangeHandler}
-                        name='state'
-                        value={formData.state}
-                        className='
-                            border
-                            border-gray-300
-                            rounded
-                            py-1.5
-                            px-3.5
-                            w-full
-                        '
-                        type='text'
-                        placeholder='State'
-                    />
-
-                </div>
-
-
-                {/* ZIPCODE + COUNTRY */}
-
-                <div className='flex gap-3'>
-
-                    <input
-                        required
-                        onChange={onChangeHandler}
-                        name='zipcode'
-                        value={formData.zipcode}
-                        className='
-                            border
-                            border-gray-300
-                            rounded
-                            py-1.5
-                            px-3.5
-                            w-full
-                        '
-                        type='text'
-                        inputMode='numeric'
-                        placeholder='Zipcode'
-                    />
-
-
-                    <input
-                        required
-                        onChange={onChangeHandler}
-                        name='country'
-                        value={formData.country}
-                        className='
-                            border
-                            border-gray-300
-                            rounded
-                            py-1.5
-                            px-3.5
-                            w-full
-                        '
-                        type='text'
-                        placeholder='Country'
-                    />
-
-                </div>
-
-
-                {/* PHONE */}
-
-                <input
-                    required
-                    onChange={onChangeHandler}
-                    name='phone'
-                    value={formData.phone}
-                    className='
-                        border
-                        border-gray-300
-                        rounded
-                        py-1.5
-                        px-3.5
-                        w-full
-                    '
-                    type='tel'
-                    inputMode='numeric'
-                    placeholder='Phone'
-                />
-
+            <div className='border border-yellow-200 bg-yellow-50 rounded-xl p-4 mb-4'>
+              <p className='text-sm font-medium text-yellow-800'>Online payments temporarily unavailable</p>
+              <p className='text-xs text-yellow-700 mt-1'>We're currently accepting Cash on Delivery only.</p>
             </div>
 
-
-            {/* =================================================
-                ORDER SUMMARY + PAYMENT
-            ================================================= */}
-
-
-            <div className='mt-8'>
-
-
-                {/* CART TOTAL */}
-
-                <div className='mt-8 min-w-80'>
-
-                    <CartTotal />
-
-                </div>
-
-
-                {/* PAYMENT METHOD */}
-
-                <div className='mt-12'>
-
-
-                    <Title
-                        text1={'PAYMENT'}
-                        text2={'METHOD'}
-                    />
-
-
-                    {/* =================================================
-                        TECHNICAL GLITCH MESSAGE
-                    ================================================= */}
-
-                    <div
-                        className='
-                            border
-                            border-yellow-300
-                            bg-yellow-50
-                            rounded
-                            p-4
-                            mt-4
-                        '
-                    >
-
-                        <p
-                            className='
-                                text-sm
-                                text-yellow-800
-                                font-medium
-                            '
-                        >
-                            Online payments are temporarily unavailable.
-                        </p>
-
-
-                        <p
-                            className='
-                                text-sm
-                                text-yellow-700
-                                mt-1
-                            '
-                        >
-                            Due to a technical issue, we are currently
-                            accepting only Cash on Delivery orders.
-                        </p>
-
-                    </div>
-
-
-                    {/* =================================================
-                        CASH ON DELIVERY
-                    ================================================= */}
-
-                    <div
-                        className='
-                            flex
-                            items-center
-                            gap-3
-                            border
-                            border-green-500
-                            p-3
-                            px-4
-                            mt-4
-                        '
-                    >
-
-                        <p
-                            className='
-                                min-w-3.5
-                                h-3.5
-                                border
-                                border-green-500
-                                rounded-full
-                                bg-green-400
-                            '
-                        />
-
-
-                        <p
-                            className='
-                                text-gray-700
-                                text-sm
-                                font-medium
-                                mx-2
-                            '
-                        >
-                            CASH ON DELIVERY
-                        </p>
-
-                    </div>
-
-
-                    {/* =================================================
-                        PLACE ORDER BUTTON
-                    ================================================= */}
-
-                    <div
-                        className='
-                            w-full
-                            text-end
-                            mt-8
-                        '
-                    >
-
-                        <button
-                            type='submit'
-                            className='
-                                bg-black
-                                text-white
-                                px-16
-                                py-3
-                                text-sm
-                            '
-                        >
-                            PLACE ORDER
-                        </button>
-
-                    </div>
-
-                </div>
-
+            <div className='flex items-center gap-3 border border-gray-200 rounded-xl p-4'>
+              <div className='w-3.5 h-3.5 rounded-full bg-black flex-shrink-0' />
+              <p className='text-sm font-medium text-gray-800'>Cash on Delivery</p>
+              <span className='ml-auto text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium'>Selected</span>
             </div>
+          </div>
 
-        </form>
-
-    )
+          <button
+            type='submit'
+            disabled={loading}
+            className='w-full bg-black text-white text-sm font-medium py-4 rounded-full hover:bg-gray-800 transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2'
+          >
+            {loading && (
+              <svg className='w-4 h-4 animate-spin' fill='none' viewBox='0 0 24 24'>
+                <circle className='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' strokeWidth='4' />
+                <path className='opacity-75' fill='currentColor' d='M4 12a8 8 0 018-8v8z' />
+              </svg>
+            )}
+            {loading ? 'Placing Order…' : 'Place Order'}
+          </button>
+        </div>
+      </div>
+    </form>
+  )
 }
-
 
 export default PlaceOrder

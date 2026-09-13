@@ -1,165 +1,90 @@
 import React from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { assets } from '../assets/assets'
 
 const Footer = () => {
-
-  const navigate = useNavigate()
-
   return (
-    <div>
+    <footer className='border-t border-gray-100 mt-16 bg-white'>
+      <div className='max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-14'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10'>
 
-      <div className='flex flex-col sm:grid grid-cols-[3fr_1fr_1fr] gap-14 my-10 mt-40 text-sm'>
-
-        {/* BRAND / ABOUT */}
-        <div>
-          <img
-            src={assets.logo}
-            className='mb-5 w-32'
-            alt="Forever"
-          />
-
-          <p className='w-full md:w-2/3 text-gray-600 leading-6'>
-            Forever is your destination for modern fashion and everyday
-            essentials. Discover quality products designed to bring style,
-            comfort and confidence to your wardrobe.
-          </p>
-        </div>
-
-
-        {/* COMPANY */}
-        <div>
-          <p className='text-xl font-medium mb-5'>
-            COMPANY
-          </p>
-
-          <ul className='flex flex-col gap-3 text-gray-600'>
-
-            <li
-              onClick={() => navigate('/')}
-              className='cursor-pointer hover:text-black transition'
-            >
-              Home
-            </li>
-
-            <li
-              onClick={() => navigate('/about')}
-              className='cursor-pointer hover:text-black transition'
-            >
-              About Us
-            </li>
-
-            <li
-              onClick={() => navigate('/collection')}
-              className='cursor-pointer hover:text-black transition'
-            >
-              Collection
-            </li>
-
-            <li
-              onClick={() => navigate('/contact')}
-              className='cursor-pointer hover:text-black transition'
-            >
-              Contact Us
-            </li>
-
-          </ul>
-        </div>
-
-
-        {/* POLICIES */}
-        <div>
-          <p className='text-xl font-medium mb-5'>
-            POLICIES
-          </p>
-
-          <div className='flex flex-col gap-3 text-gray-600'>
-
-            <p
-              onClick={() => navigate('/terms')}
-              className='cursor-pointer hover:text-black transition'
-            >
-              Terms & Conditions
+          {/* Brand */}
+          <div className='lg:col-span-1'>
+            <Link to='/'>
+              <img src={assets.logo} className='h-8 w-auto mb-4' alt='Forever Store' />
+            </Link>
+            <p className='text-sm text-gray-500 leading-relaxed'>
+              Your destination for modern fashion and everyday essentials. Quality products, delivered to your door.
             </p>
-
-            <p
-              onClick={() => navigate('/privacy')}
-              className='cursor-pointer hover:text-black transition'
-            >
-              Privacy Policy
-            </p>
-
-            <p
-              onClick={() => navigate('/shipping')}
-              className='cursor-pointer hover:text-black transition'
-            >
-              Shipping Policy
-            </p>
-
-            <p
-              onClick={() => navigate('/refund')}
-              className='cursor-pointer hover:text-black transition'
-            >
-              Cancellation & Refund
-            </p>
-
-            <p
-              onClick={() => navigate('/contact')}
-              className='cursor-pointer hover:text-black transition'
-            >
-              Contact Us
-            </p>
-
           </div>
-        </div>
 
-      </div>
-
-
-      {/* CONTACT INFORMATION */}
-
-      <div className='border-t pt-8 pb-8'>
-
-        <div className='flex flex-col sm:flex-row justify-between gap-6 text-sm'>
-
+          {/* Shop */}
           <div>
-            <p className='font-medium mb-2'>
-              GET IN TOUCH
-            </p>
-
-            <div className='flex flex-col gap-1 text-gray-600'>
-              <p>+91 XXXXX XXXXX</p>
-              <p>support@yourdomain.com</p>
-            </div>
+            <p className='text-xs font-semibold tracking-widest text-gray-900 uppercase mb-5'>Shop</p>
+            <ul className='flex flex-col gap-3'>
+              {[
+                { to: '/collection', label: 'All Products' },
+                { to: '/collection', label: 'Men' },
+                { to: '/collection', label: 'Women' },
+                { to: '/collection', label: 'Kids' },
+              ].map(({ to, label }) => (
+                <li key={label}>
+                  <Link to={to} onClick={() => scrollTo(0, 0)} className='text-sm text-gray-500 hover:text-black transition-colors'>
+                    {label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
 
-
+          {/* Company */}
           <div>
-            <p className='font-medium mb-2'>
-              CUSTOMER SUPPORT
-            </p>
-
-            <p className='text-gray-600'>
-              Monday – Saturday, 10:00 AM – 6:00 PM IST
-            </p>
+            <p className='text-xs font-semibold tracking-widest text-gray-900 uppercase mb-5'>Company</p>
+            <ul className='flex flex-col gap-3'>
+              {[
+                { to: '/', label: 'Home' },
+                { to: '/about', label: 'About Us' },
+                { to: '/contact', label: 'Contact' },
+              ].map(({ to, label }) => (
+                <li key={label}>
+                  <Link to={to} onClick={() => scrollTo(0, 0)} className='text-sm text-gray-500 hover:text-black transition-colors'>
+                    {label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
 
+          {/* Support */}
+          <div>
+            <p className='text-xs font-semibold tracking-widest text-gray-900 uppercase mb-5'>Support</p>
+            <ul className='flex flex-col gap-3'>
+              {[
+                { to: '/terms', label: 'Terms & Conditions' },
+                { to: '/privacy', label: 'Privacy Policy' },
+                { to: '/shipping', label: 'Shipping Policy' },
+                { to: '/refund', label: 'Returns & Refunds' },
+              ].map(({ to, label }) => (
+                <li key={label}>
+                  <Link to={to} onClick={() => scrollTo(0, 0)} className='text-sm text-gray-500 hover:text-black transition-colors'>
+                    {label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
 
+        {/* Bottom bar */}
+        <div className='mt-12 pt-6 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3'>
+          <p className='text-xs text-gray-400'>© 2026 Forever Store. All rights reserved.</p>
+          <div className='flex gap-5 text-xs text-gray-400'>
+            <span>support@foreverstore.in</span>
+            <span>+91 8825156176</span>
+          </div>
+        </div>
       </div>
-
-
-      {/* COPYRIGHT */}
-
-      <div>
-        <hr />
-
-        <p className='py-5 text-sm text-center text-gray-500'>
-          Copyright © 2026 Forever. All Rights Reserved.
-        </p>
-      </div>
-
-    </div>
+    </footer>
   )
 }
 

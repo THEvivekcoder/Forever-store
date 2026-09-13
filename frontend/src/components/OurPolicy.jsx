@@ -1,27 +1,44 @@
 import React from 'react'
 import { assets } from '../assets/assets'
 
+const policies = [
+  {
+    icon: assets.exchange_icon,
+    title: 'Easy Exchange',
+    desc: 'Hassle-free exchange on all eligible orders within 7 days.',
+  },
+  {
+    icon: assets.quality_icon,
+    title: '7-Day Returns',
+    desc: 'Not satisfied? Return it within 7 days for a full refund.',
+  },
+  {
+    icon: assets.support_img,
+    title: '24/7 Support',
+    desc: 'Our team is available around the clock to help you.',
+  },
+]
+
 const OurPolicy = () => {
   return (
-    <div className='flex flex-col sm:flex-row justify-around gap-12 sm:gap-2 text-center py-20 text-xs sm:text-sm md:text-base text-gray-700'>
-      
-      <div>
-        <img src={assets.exchange_icon} className='w-12 m-auto mb-5' alt="" />
-        <p className=' font-semibold'>Easy Exchange Policy</p>
-        <p className=' text-gray-400'>We offer hassle free  exchange policy</p>
+    <section className='py-16 border-t border-gray-100'>
+      <div className='grid grid-cols-1 sm:grid-cols-3 gap-6'>
+        {policies.map(({ icon, title, desc }) => (
+          <div
+            key={title}
+            className='flex flex-col items-center text-center gap-4 p-8 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors'
+          >
+            <div className='w-12 h-12 flex items-center justify-center'>
+              <img src={icon} className='w-10 h-10 object-contain' alt={title} />
+            </div>
+            <div>
+              <p className='font-semibold text-gray-900 text-sm'>{title}</p>
+              <p className='text-gray-500 text-sm mt-1 leading-relaxed'>{desc}</p>
+            </div>
+          </div>
+        ))}
       </div>
-      <div>
-        <img src={assets.quality_icon} className='w-12 m-auto mb-5' alt="" />
-        <p className=' font-semibold'>7 Days Return Policy</p>
-        <p className=' text-gray-400'>We provide 7 days free return policy</p>
-      </div>
-      <div>
-        <img src={assets.support_img} className='w-12 m-auto mb-5' alt="" />
-        <p className=' font-semibold'>Best customer support</p>
-        <p className=' text-gray-400'>we provide 24/7 customer support</p>
-      </div>
-
-    </div>
+    </section>
   )
 }
 

@@ -3,17 +3,42 @@
 @tailwind components;
 @tailwind utilities;
 
-*{
-    font-family: Outfit;
+* {
+  font-family: 'Outfit', sans-serif;
+  box-sizing: border-box;
 }
 
-select,input,textarea{
-    border: 1px solid #c2c2c2;
-    outline-color: #C586A5;
-    border-radius: 4px;
+html {
+  scroll-behavior: smooth;
 }
 
-.active{
-    background-color: #ffebf5;
-    border-color: #C586A5;
+/* Scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: #f9fafb; }
+::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: #d1d5db; }
+
+/* Focus ring */
+input:focus, select:focus, textarea:focus {
+  outline: 2px solid #111827;
+  outline-offset: 2px;
+  border-color: transparent;
 }
+
+/* Sidebar active link */
+.sidebar-link.active {
+  background-color: #f3f4f6;
+  color: #111827;
+  font-weight: 500;
+}
+
+/* Fade in */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fadeIn { animation: fadeIn 0.25s ease forwards; }
+
+/* Spin */
+@keyframes spin { to { transform: rotate(360deg); } }
+.animate-spin { animation: spin 0.8s linear infinite; }

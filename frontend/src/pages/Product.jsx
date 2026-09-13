@@ -1,101 +1,185 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { ShopContext } from '../context/ShopContext';
-import { assets } from '../assets/assets';
-import RelatedProducts from '../components/RelatedProducts';
+import { ShopContext } from '../context/ShopContext'
+import { assets } from '../assets/assets'
+import RelatedProducts from '../components/RelatedProducts'
 
 const Product = () => {
-
-  const { productId } = useParams();
-  const { products, currency ,addToCart } = useContext(ShopContext);
-  const [productData, setProductData] = useState(false);
+  const { productId } = useParams()
+  const { products, currency, addToCart } = useContext(ShopContext)
+  const [productData, setProductData] = useState(null)
   const [image, setImage] = useState('')
-  const [size,setSize] = useState('')
-
-  const fetchProductData = async () => {
-
-    products.map((item) => {
-      if (item._id === productId) {
-        setProductData(item)
-        setImage(item.image[0])
-        return null;
-      }
-    })
-
-  }
+  const [size, setSize] = useState('')
+  const [activeTab, setActiveTab] = useState('description')
 
   useEffect(() => {
-    fetchProductData();
-  }, [productId,products])
+    const found = products.find(item => item._id === productId)
+    if (found) {
+      setProductData(found)
+      setImage(found.image[0])
+      setSize('')
+    }
+  }, [productId, products])
 
-  return productData ? (
-    <div className='border-t-2 pt-10 transition-opacity ease-in duration-500 opacity-100'>
-      {/*----------- Product Data-------------- */}
-      <div className='flex gap-12 sm:gap-12 flex-col sm:flex-row'>
-
-        {/*---------- Product Images------------- */}
-        <div className='flex-1 flex flex-col-reverse gap-3 sm:flex-row'>
-          <div className='flex sm:flex-col overflow-x-auto sm:overflow-y-scroll justify-between sm:justify-normal sm:w-[18.7%] w-full'>
-              {
-                productData.image.map((item,index)=>(
-                  <img onClick={()=>setImage(item)} src={item} key={index} className='w-[24%] sm:w-full sm:mb-3 flex-shrink-0 cursor-pointer' alt="" />
-                ))
-              }
+  if (!productData) {
+    return (
+      <div className='pt-10 border-t border-gray-100 animate-pulse'>
+        <div className='flex gap-10 flex-col sm:flex-row'>
+          <div className='flex-1 bg-gray-100 rounded-xl aspect-square' />
+          <div className='flex-1 flex flex-col gap-4 pt-4'>
+            <div className='h-7 bg-gray-100 rounded w-2/3' />
+            <div className='h-5 bg-gray-100 rounded w-1/4' />
+            <div className='h-24 bg-gray-100 rounded' />
           </div>
-          <div className='w-full sm:w-[80%]'>
-              <img className='w-full h-auto' src={image} alt="" />
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className='pt-10 border-t border-gray-100'>
+
+      {/* Main layout */}
+      <div className='flex flex-col sm:flex-row gap-8 lg:gap-14'>
+
+        {/* ── Image gallery ── */}
+        <div className='flex-1 flex flex-col-reverse sm:flex-row gap-3'>
+          {/* Thumbnails */}
+          <div className='flex sm:flex-col gap-2 overflow-x-auto sm:overflow-y-auto sm:max-h-[520px]'>
+            {productData.image.map((img, i) => (
+              <button
+                key={i}
+                onClick={() => setImage(img)}
+                className={`flex-shrink-0 w-16 sm:w-full rounded-lg overflow-hidden border-2 transition-colors ${
+                  image === img ? 'border-black' : 'border-transparent hover:border-gray-300'
+                }`}
+              >
+                <img src={img} alt={`View ${i + 1}`} className='w-full aspect-square object-cover' />
+              </button>
+            ))}
+          </div>
+
+          {/* Main image */}
+          <div className='flex-1 rounded-xl overflow-hidden bg-gray-50'>
+            <img
+              key={image}
+              src={image}
+              alt={productData.name}
+              className='w-full h-full object-cover object-top animate-fadeIn'
+            />
           </div>
         </div>
 
-        {/* -------- Product Info ---------- */}
-        <div className='flex-1'>
-          <h1 className='font-medium text-2xl mt-2'>{productData.name}</h1>
-          <div className=' flex items-center gap-1 mt-2'>
-              <img src={assets.star_icon} alt="" className="w-3 5" />
-              <img src={assets.star_icon} alt="" className="w-3 5" />
-              <img src={assets.star_icon} alt="" className="w-3 5" />
-              <img src={assets.star_icon} alt="" className="w-3 5" />
-              <img src={assets.star_dull_icon} alt="" className="w-3 5" />
-              <p className='pl-2'>(122)</p>
+        {/* ── Product info ── */}
+        <div className='flex-1 flex flex-col gap-5'>
+
+          <div>
+            <p className='text-xs font-semibold tracking-widest text-gray-400 uppercase mb-2'>
+              {productData.category} · {productData.subCategory}
+            </p>
+            <h1 className='text-2xl sm:text-3xl font-medium text-gray-900 leading-snug'>
+              {productData.name}
+            </h1>
           </div>
-          <p className='mt-5 text-3xl font-medium'>{currency}{productData.price}</p>
-          <p className='mt-5 text-gray-500 md:w-4/5'>{productData.description}</p>
-          <div className='flex flex-col gap-4 my-8'>
-              <p>Select Size</p>
-              <div className='flex gap-2'>
-                {productData.sizes.map((item,index)=>(
-                  <button onClick={()=>setSize(item)} className={`border py-2 px-4 bg-gray-100 ${item === size ? 'border-orange-500' : ''}`} key={index}>{item}</button>
+
+          {/* Stars */}
+          <div className='flex items-center gap-1'>
+            {[1,2,3,4].map(i => (
+              <img key={i} src={assets.star_icon} className='w-4 h-4' alt='' />
+            ))}
+            <img src={assets.star_dull_icon} className='w-4 h-4' alt='' />
+            <span className='text-sm text-gray-400 ml-1'>(122 reviews)</span>
+          </div>
+
+          {/* Price */}
+          <p className='text-3xl font-semibold text-gray-900'>
+            {currency}{productData.price.toLocaleString('en-IN')}
+          </p>
+
+          {/* Description */}
+          <p className='text-sm text-gray-500 leading-relaxed border-t border-gray-100 pt-4'>
+            {productData.description}
+          </p>
+
+          {/* Size selector */}
+          {productData.sizes?.length > 0 && (
+            <div>
+              <div className='flex items-center justify-between mb-3'>
+                <p className='text-sm font-medium text-gray-900'>Select Size</p>
+                {!size && <p className='text-xs text-gray-400'>Please choose a size</p>}
+              </div>
+              <div className='flex flex-wrap gap-2'>
+                {productData.sizes.map(s => (
+                  <button
+                    key={s}
+                    onClick={() => setSize(s)}
+                    className={`px-4 py-2 text-sm border rounded-lg font-medium transition-colors ${
+                      size === s
+                        ? 'border-black bg-black text-white'
+                        : 'border-gray-200 text-gray-700 hover:border-gray-400'
+                    }`}
+                  >
+                    {s}
+                  </button>
                 ))}
               </div>
-          </div>
-          <button onClick={()=>addToCart(productData._id,size)} className='bg-black text-white px-8 py-3 text-sm active:bg-gray-700'>ADD TO CART</button>
-          <hr className='mt-8 sm:w-4/5' />
-          <div className='text-sm text-gray-500 mt-5 flex flex-col gap-1'>
-              <p>100% Original product.</p>
-              <p>Cash on delivery is available on this product.</p>
-              <p>Easy return and exchange policy within 7 days.</p>
+            </div>
+          )}
+
+          {/* Add to cart */}
+          <button
+            onClick={() => addToCart(productData._id, size)}
+            className={`w-full sm:w-auto px-10 py-3.5 text-sm font-medium rounded-full transition-colors ${
+              size
+                ? 'bg-black text-white hover:bg-gray-800'
+                : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+            }`}
+          >
+            {size ? 'Add to Cart' : 'Select a Size'}
+          </button>
+
+          {/* Assurance */}
+          <div className='border-t border-gray-100 pt-4 flex flex-col gap-2'>
+            {['100% Original product', 'Cash on delivery available', 'Easy return within 7 days'].map(text => (
+              <div key={text} className='flex items-center gap-2 text-xs text-gray-500'>
+                <span className='w-1.5 h-1.5 rounded-full bg-green-500 flex-shrink-0' />
+                {text}
+              </div>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* ---------- Description & Review Section ------------- */}
-      <div className='mt-20'>
-        <div className='flex'>
-          <b className='border px-5 py-3 text-sm'>Description</b>
-          <p className='border px-5 py-3 text-sm'>Reviews (122)</p>
+      {/* ── Description / Reviews tabs ── */}
+      <div className='mt-16'>
+        <div className='flex border-b border-gray-200'>
+          {['description', 'reviews'].map(tab => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`px-6 py-3 text-sm font-medium capitalize transition-colors border-b-2 -mb-[2px] ${
+                activeTab === tab
+                  ? 'border-black text-black'
+                  : 'border-transparent text-gray-500 hover:text-black'
+              }`}
+            >
+              {tab === 'reviews' ? 'Reviews (122)' : 'Description'}
+            </button>
+          ))}
         </div>
-        <div className='flex flex-col gap-4 border px-6 py-6 text-sm text-gray-500'>
-          <p>An e-commerce website is an online platform that facilitates the buying and selling of products or services over the internet. It serves as a virtual marketplace where businesses and individuals can showcase their products, interact with customers, and conduct transactions without the need for a physical presence. E-commerce websites have gained immense popularity due to their convenience, accessibility, and the global reach they offer.</p>
-          <p>E-commerce websites typically display products or services along with detailed descriptions, images, prices, and any available variations (e.g., sizes, colors). Each product usually has its own dedicated page with relevant information.</p>
+        <div className='py-6 px-1 text-sm text-gray-600 leading-relaxed max-w-2xl'>
+          {activeTab === 'description' ? (
+            <p>{productData.description || 'No description available for this product.'}</p>
+          ) : (
+            <p className='text-gray-400 italic'>Customer reviews coming soon.</p>
+          )}
         </div>
       </div>
 
-      {/* --------- display related products ---------- */}
-
+      {/* Related products */}
       <RelatedProducts category={productData.category} subCategory={productData.subCategory} />
-
     </div>
-  ) : <div className=' opacity-0'></div>
+  )
 }
 
 export default Product

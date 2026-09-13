@@ -1,10 +1,19 @@
 import React from 'react'
 
-const Title = ({text1,text2}) => {
+/**
+ * Section title used across the site.
+ * text1 — lighter grey word
+ * text2 — bold dark word
+ * center — centres the block (default false)
+ */
+const Title = ({ text1, text2, center = false }) => {
   return (
-    <div className='inline-flex gap-2 items-center mb-3'>
-      <p className='text-gray-500'>{text1} <span className='text-gray-700 font-medium'>{text2}</span></p>
-      <p className='w-8 sm:w-12 h-[1px] sm:h-[2px] bg-gray-700'></p>
+    <div className={`flex flex-col gap-2 mb-2 ${center ? 'items-center text-center' : 'items-start'}`}>
+      <h2 className='text-2xl sm:text-3xl font-medium tracking-tight text-gray-900'>
+        <span className='text-gray-400 font-normal'>{text1} </span>
+        {text2}
+      </h2>
+      <span className={`h-[2px] bg-gray-900 rounded-full ${center ? 'w-12' : 'w-10'}`} />
     </div>
   )
 }
