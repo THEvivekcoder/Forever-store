@@ -9,7 +9,7 @@ A full-stack e-commerce platform built with the MERN stack, featuring a customer
 | Service | Link |
 |---|---|
 | 🛒 Frontend Storefront | [forever-store-sylo.vercel.app](https://forever-store-sylo.vercel.app/) |
-| 🛠️ Admin Panel | [forever-store-gkj2.vercel.app/add](https://forever-store-gkj2.vercel.app/add) |
+| 🛠️ Admin Panel | [forever-store-gkj2.vercel.app/add](https://forever-store-gkj2.vercel.app) |
 | ⚙️ Backend API | [forever-store-odmn.onrender.com](https://forever-store-odmn.onrender.com) |
 
 ---
