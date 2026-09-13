@@ -1,213 +1,124 @@
 # Forever Store 🛍️
 
-A full-stack e-commerce web application built with the MERN stack. It includes a customer-facing storefront, an admin dashboard for managing products and orders, and a Node.js/Express backend with MongoDB.
+A full-stack e-commerce platform built with the MERN stack, featuring a customer-facing storefront, a dedicated admin panel, and a REST API backend — with integrated payments, image management, and secure authentication.
 
 ---
 
-## Live Demo
+## 🚀 Live Demo
 
-| App | URL |
-|-----|-----|
-| Frontend | _coming soon_ |
-| Admin Panel | _coming soon_ |
-| Backend API | https://forever-store-odmn.onrender.com |
-
----
-
-## Features
-
-### Customer Storefront
-- Browse products by category and sub-category
-- Search and filter products
-- Add to cart, update quantities, remove items
-- User registration and login (JWT auth)
-- Place orders with Cash on Delivery
-- View order history
-
-### Admin Panel
-- Secure admin login
-- Add new products with up to 4 images (uploaded to Cloudinary)
-- List and remove products
-- View and manage all orders
-- Update order status
-
-### Backend API
-- RESTful API built with Express.js
-- MongoDB with Mongoose for data storage
-- JWT-based authentication for users and admin
-- Cloudinary integration for image uploads
-- Razorpay and Stripe payment gateway support
-- Multer for handling multipart/form-data
+| Service | Link |
+|---|---|
+| 🛒 Frontend Storefront | [forever-store-sylo.vercel.app](https://forever-store-sylo.vercel.app/) |
+| 🛠️ Admin Panel | [forever-store-gkj2.vercel.app/add](https://forever-store-gkj2.vercel.app/add) |
+| ⚙️ Backend API | [forever-store-odmn.onrender.com](https://forever-store-odmn.onrender.com) |
 
 ---
 
-## Tech Stack
+## ✨ Features
 
-| Layer | Technology |
-|-------|-----------|
-| Frontend | React 18, React Router v6, Tailwind CSS, Axios, Vite |
-| Admin | React 18, React Router v6, Tailwind CSS, Axios, Vite |
-| Backend | Node.js, Express.js |
-| Database | MongoDB Atlas (Mongoose) |
-| Auth | JSON Web Tokens (JWT), bcrypt |
-| Image Storage | Cloudinary |
-| Payments | Razorpay, Stripe |
+### Customer
+- Browse and search the product catalog
+- Filter products by category and sub-category
+- Add, update, and manage cart items
+- User registration and login with secure authentication
+- Place orders with integrated payment gateways
+- View order history and track order status
+
+### Admin
+- Secure admin authentication and login
+- Add, update, and remove products
+- Upload and manage product images via Cloudinary
+- View and manage customer orders
+- Update order status in real time
 
 ---
 
-## Project Structure
+## 🛠️ Tech Stack
 
-```
+| Layer | Technologies |
+|---|---|
+| **Frontend** | React, Vite, Tailwind CSS, Axios |
+| **Admin Panel** | React, Vite, Tailwind CSS |
+| **Backend** | Node.js, Express.js |
+| **Database** | MongoDB Atlas |
+| **Authentication** | JWT, bcrypt |
+| **Image Storage** | Cloudinary |
+| **Payments** | Razorpay, Stripe |
+| **Deployment** | Vercel (Frontend & Admin), Render (Backend) |
+
+---
+
+## 📁 Project Structure
+
+```text
 forever-store/
-├── frontend/       # Customer-facing React app
-├── admin/          # Admin dashboard React app
-└── backend/        # Express.js REST API
+├── frontend/     # Customer-facing storefront (React + Vite)
+├── admin/        # Admin dashboard for product & order management
+└── backend/      # REST API, database models, and business logic
 ```
 
 ---
 
-## Getting Started
+## ⚙️ Getting Started
 
 ### Prerequisites
-
-- Node.js >= 18
+- Node.js (v18 or higher)
 - MongoDB Atlas account
 - Cloudinary account
-- Razorpay account (for payments)
+- Razorpay / Stripe API keys
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/THEvivekcoder/forever-store.git
+   cd forever-store
+   ```
+
+2. **Set up the backend**
+   ```bash
+   cd backend
+   npm install
+   ```
+   Create a `.env` file with the required environment variables (MongoDB URI, JWT secret, Cloudinary keys, payment gateway keys), then run:
+   ```bash
+   npm run server
+   ```
+
+3. **Set up the frontend**
+   ```bash
+   cd ../frontend
+   npm install
+   npm run dev
+   ```
+
+4. **Set up the admin panel**
+   ```bash
+   cd ../admin
+   npm install
+   npm run dev
+   ```
 
 ---
 
-### 1. Backend Setup
+## 🔐 Environment Variables
 
-```bash
-cd backend
-npm install
-```
-
-Create a `.env` file in the `backend` folder:
+Each app requires its own `.env` file. At minimum, the backend expects:
 
 ```env
-JWT_SECRET=your_jwt_secret
-ADMIN_EMAIL=admin@example.com
-ADMIN_PASSWORD=yourpassword
-
-MONGODB_URI=your_mongodb_connection_string
-
-CLOUDINARY_NAME=your_cloud_name
-CLOUDINARY_API_KEY=your_api_key
-CLOUDINARY_SECRET_KEY=your_api_secret
-
-RAZORPAY_KEY_ID=your_razorpay_key_id
-RAZORPAY_KEY_SECRET=your_razorpay_key_secret
-
-STRIPE_SECRET_KEY=your_stripe_secret_key
+MONGODB_URI=
+JWT_SECRET=
+CLOUDINARY_NAME=
+CLOUDINARY_API_KEY=
+CLOUDINARY_SECRET_KEY=
+RAZORPAY_KEY_ID=
+RAZORPAY_KEY_SECRET=
+STRIPE_SECRET_KEY=
 ```
-
-Start the server:
-
-```bash
-npm run server     # development (nodemon)
-npm start          # production
-```
-
-The API runs on `http://localhost:4000`.
 
 ---
 
-### 2. Frontend Setup
+## 🤝 Contributing
 
-```bash
-cd frontend
-npm install
-```
+Contributions are welcome! Please fork the repository, create a feature branch, and submit a pull request describing your changes.
 
-Create a `.env` file in the `frontend` folder:
-
-```env
-VITE_BACKEND_URL=http://localhost:4000
-```
-
-Start the dev server:
-
-```bash
-npm run dev
-```
-
-Runs on `http://localhost:5173`.
-
----
-
-### 3. Admin Setup
-
-```bash
-cd admin
-npm install
-```
-
-Create a `.env` file in the `admin` folder:
-
-```env
-VITE_BACKEND_URL=http://localhost:4000
-```
-
-Start the dev server:
-
-```bash
-npm run dev
-```
-
-Runs on `http://localhost:5174`.
-
----
-
-## API Endpoints
-
-### User
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/user/register` | Register a new user |
-| POST | `/api/user/login` | Login user |
-| POST | `/api/user/admin` | Admin login |
-
-### Products
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/product/list` | Get all products |
-| POST | `/api/product/add` | Add product (admin) |
-| POST | `/api/product/remove` | Remove product (admin) |
-| POST | `/api/product/single` | Get single product |
-
-### Cart
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/cart/add` | Add item to cart |
-| POST | `/api/cart/update` | Update cart item |
-| POST | `/api/cart/get` | Get user cart |
-
-### Orders
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/order/place` | Place COD order |
-| POST | `/api/order/stripe` | Place Stripe order |
-| POST | `/api/order/razorpay` | Place Razorpay order |
-| POST | `/api/order/userorders` | Get user orders |
-| POST | `/api/order/list` | Get all orders (admin) |
-| POST | `/api/order/status` | Update order status (admin) |
-
----
-
-## Deployment
-
-| Service | Platform |
-|---------|----------|
-| Backend | [Render](https://render.com) |
-| Frontend | [Vercel](https://vercel.com) |
-| Admin | [Vercel](https://vercel.com) |
-
-Set the respective environment variables in each platform's dashboard before deploying.
-
----
-
-## License
-
-This project is for educational purposes.
